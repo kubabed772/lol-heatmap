@@ -1,8 +1,11 @@
 package pl.jbedlinski.heatmap.riot;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+
+import java.util.List;
 
 @Component
 public class RiotClient {
@@ -21,5 +24,19 @@ public class RiotClient {
                 .uri("/riot/account/v1/accounts/by-riot-id/{name}/{tag}", name, tag)
                 .retrieve()
                 .body(AccountDto.class);
+    }
+
+    public List<String> getMatchIds(String puuid, int count) {
+        return rest.get()
+                .uri("/lol/match/v5/matches/by-puuid/{puuid}/ids?count={count}", puuid, count)
+                .retrieve()
+                .body(new ParameterizedTypeReference<List<String>>() {});
+    }
+
+    public MatchDto getMatch(String matchId) {
+        return rest.get()
+                .uri("/lol/match/v5/matches/{matchId}", matchId)
+                .retrieve()
+                .body(MatchDto.class);
     }
 }

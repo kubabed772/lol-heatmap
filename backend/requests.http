@@ -3,3 +3,9 @@ GET http://localhost:6767/api/ping
 
 ### konto
 GET http://localhost:6767/api/riot/account?name=Słodki Femboy&tag=2137
+
+### mecze (puuid moje z ^^)
+GET http://localhost:6767/api/riot/matches?puuid=CHA2Xl8_lMpv5T1H3aHG7UADYWgWX2yenl71Zz-2JSqSKOlCdZVVm0ajj_zDYrKzFG4KcsKB-j3_bg&count=8
+
+### wszyscy gracze z przykladowego meczu
+GET http://localhost:6767/api/riot/matches/EUN1_4009128240

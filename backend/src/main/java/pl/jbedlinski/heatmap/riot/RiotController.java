@@ -1,9 +1,8 @@
 package pl.jbedlinski.heatmap.riot;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/riot")
@@ -19,6 +18,17 @@ public class RiotController {
     public AccountDto getAccount(@RequestParam String name,
                                  @RequestParam String tag) {
         return riotClient.getAccount(name, tag);
+    }
+
+    @GetMapping("/matches")
+    public List<String> getMatchIds(@RequestParam String puuid,
+                                    @RequestParam(defaultValue = "5") int count) {
+        return riotClient.getMatchIds(puuid, count);
+    }
+
+    @GetMapping("/matches/{matchId}")
+    public MatchDto getMatch(@PathVariable String matchId){
+        return riotClient.getMatch(matchId);
     }
 
 }
