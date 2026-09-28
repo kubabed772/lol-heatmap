@@ -31,4 +31,9 @@ public class RiotController {
         return riotClient.getMatch(matchId);
     }
 
+    @GetMapping("/matches/{matchId}/timeline")
+    public TimelineDto getTimeline(@PathVariable String matchId){
+        return riotClient.getTimeline(matchId);
+    }
+
 }

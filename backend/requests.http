@@ -9,3 +9,6 @@ GET http://localhost:6767/api/riot/matches?puuid=CHA2Xl8_lMpv5T1H3aHG7UADYWgWX2y
 
 ### wszyscy gracze z przykladowego meczu
 GET http://localhost:6767/api/riot/matches/EUN1_4009128240
+
+### timeline
+GET http://localhost:6767/api/riot/matches/EUN1_4009128240/timeline

@@ -39,4 +39,11 @@ public class RiotClient {
                 .retrieve()
                 .body(MatchDto.class);
     }
+
+    public TimelineDto getTimeline(String matchId){
+        return rest.get()
+                .uri("/lol/match/v5/matches/{matchId}/timeline", matchId)
+                .retrieve()
+                .body(TimelineDto.class);
+    }
 }
