@@ -1,0 +1,15 @@
+server:
+  port: 6767
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:6868/heatmap}
+    username: ${DB_USER:heatmap}
+    password: ${DB_PASSWORD:heatmap}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+riot:
+  api-key: ${RIOT_API_KEY:}
+  region: europe
