@@ -1,0 +1,5 @@
+### ping
+GET http://localhost:6767/api/ping
+
+### konto
+GET http://localhost:6767/api/riot/account?name=Słodki Femboy&tag=2137
