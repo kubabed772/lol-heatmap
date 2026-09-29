@@ -1,75 +1,77 @@
 package pl.jbedlinski.heatmap.events;
 
 import org.springframework.stereotype.Service;
-import pl.jbedlinski.heatmap.riot.MatchDto;
+import pl.jbedlinski.heatmap.match.*;
 import pl.jbedlinski.heatmap.riot.RiotClient;
-import pl.jbedlinski.heatmap.riot.TimelineDto;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class EventService {
 
     private final RiotClient riotClient;
+    private final MatchImportService matchImportService;
+    private final MatchRepository matchRepository;
+    private final ParticipantRepository participantRepository;
+    private final KillEventRepository killEventRepository;
 
-    public EventService(RiotClient riotClient) {
+    public EventService(RiotClient riotClient,
+                        MatchImportService matchImportService,
+                        MatchRepository matchRepository,
+                        ParticipantRepository participantRepository,
+                        KillEventRepository killEventRepository) {
         this.riotClient = riotClient;
+        this.matchImportService = matchImportService;
+        this.matchRepository = matchRepository;
+        this.participantRepository = participantRepository;
+        this.killEventRepository = killEventRepository;
     }
 
-    public List<HeatmapPoint> getPoints(String name, String tag, int count){
+    public List<HeatmapPoint> getPoints(String name, String tag, int count) {
         String puuid = riotClient.getAccount(name, tag).puuid();
         List<String> matchIds = riotClient.getMatchIds(puuid, count);
 
         List<HeatmapPoint> result = new ArrayList<>();
 
-        for(String matchId : matchIds){
-            MatchDto match = riotClient.getMatch(matchId);
-
-            MatchDto.Participant me = match.info().participants().stream()
-                    .filter(p -> p.puuid().equals(puuid))
-                    .findFirst()
-                    .orElseThrow();
-
-            if (match.info().mapId() != 11) {
-                continue;
+        for (String matchId : matchIds) {
+            if (!matchRepository.existsById(matchId)) {
+                matchImportService.importMatch(matchId);
             }
 
-            int myId = me.participantId();
-            TimelineDto timeline = riotClient.getTimeline(matchId);
+            MatchEntity match = matchRepository.findById(matchId).orElseThrow();
+            if (match.getMapId() != 11) continue;
 
-            for(TimelineDto.Frame frame : timeline.info().frames()) {
-                for(TimelineDto.Event e : frame.events()) {
-                    if(!"CHAMPION_KILL".equals(e.type()) || e.position()==null) continue;
+            ParticipantEntity me = participantRepository.findByMatchIdAndPuuid(matchId, puuid).orElseThrow();
+            int myId = me.getParticipantId();
 
-                    EventType type = resolveType(e, myId);
+            for (KillEventEntity e : killEventRepository.findByMatchIdOrderByTimestamp(matchId)) {
+                EventType type = resolveType(e, myId);
+                if (type == null) continue;
 
-                    if (type == null) continue;
-
-                    result.add(new HeatmapPoint(
-                            matchId,
-                            me.championName(),
-                            type,
-                            e.position().x(),
-                            e.position().y(),
-                            e.timestamp()
-                    ));
-                }
+                result.add(new HeatmapPoint(
+                        matchId,
+                        me.getChampionName(),
+                        type,
+                        e.getX(),
+                        e.getY(),
+                        e.getTimestamp()
+                ));
             }
         }
 
         return result;
     }
 
-    private EventType resolveType(TimelineDto.Event e, int myId) {
-        if (Objects.equals(e.killerId(), myId)) {
+    private EventType resolveType(KillEventEntity e, int myId) {
+        if (e.getKillerId() == myId) {
             return EventType.KILL;
         }
-        if (Objects.equals(e.victimId(), myId)) {
+        if (e.getVictimId() == myId) {
             return EventType.DEATH;
         }
-        if (e.assistingParticipantIds() != null && e.assistingParticipantIds().contains(myId)) {
+        if (Arrays.asList(e.getAssistIds()).contains(myId)) {
             return EventType.ASSIST;
         }
         return null;

@@ -16,6 +16,13 @@ public class RiotClient {
         this.rest = RestClient.builder()
                 .baseUrl("https://" + region + ".api.riotgames.com")
                 .defaultHeader("X-Riot-Token", apiKey)
+                .defaultStatusHandler(
+                        status -> status.value() == 429,
+                        (request, response) -> {
+                            String header = response.getHeaders().getFirst("Retry-After");
+                            long seconds = header != null ? Long.parseLong(header) : 10;
+                            throw new RateLimitException(seconds);
+                        })
                 .build();
     }
 

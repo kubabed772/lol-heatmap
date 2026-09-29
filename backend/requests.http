@@ -14,4 +14,7 @@ GET http://localhost:6767/api/riot/matches/EUN1_4009128240
 GET http://localhost:6767/api/riot/matches/EUN1_4009128240/timeline
 
 ### moje eventy
-GET http://localhost:6767/api/events?name=Słodki Femboy&tag=2137&count=1
+GET http://localhost:6767/api/events?name=DobraDobra&tag=12345&count=1
+
+### duzo meczow - test limitu
+GET http://localhost:6767/api/events?name=Słodki Femboy&tag=2137&count=70

@@ -9,6 +9,7 @@ spring:
     hibernate:
       ddl-auto: update
     open-in-view: false
+    show-sql: true
 
 riot:
   api-key: ${RIOT_API_KEY:}
