@@ -1,4 +1,4 @@
-import { Component, ElementRef, afterRenderEffect, inject, signal, viewChild } from '@angular/core';
+import {Component, ElementRef, afterRenderEffect, inject, signal, viewChild, computed} from '@angular/core';
 import { EventsService } from './events.service';
 import {EventType, HeatmapPoint} from './heatmap-point';
 
@@ -21,15 +21,52 @@ export class App {
 
   protected readonly points = signal<HeatmapPoint[]>([]);
 
+  protected readonly types: EventType[] = ['KILL', 'DEATH', 'ASSIST'];
+  
+  protected readonly colors = COLORS;
+
+  protected readonly visibleTypes = signal<Record<EventType, boolean>>({
+    KILL: true,
+    DEATH: true,
+    ASSIST: true,
+  });
+
+  protected readonly visiblePoints = computed(() =>
+    this.points().filter(p => this.visibleTypes()[p.type])
+  );
+
+  protected readonly counts = computed(() => {
+    const c: Record<EventType, number> = { KILL: 0, DEATH: 0, ASSIST: 0 };
+    for (const p of this.points()) c[p.type]++;
+    return c;
+  });
+
+  protected readonly loading = signal(false);
+
   private canvas = viewChild.required<ElementRef<HTMLCanvasElement>>('canvas');
 
   constructor() {
-    this.eventsService.getPoints('Słodki Femboy', '2137', 1).subscribe(result => {
-      console.log(result);
-      this.points.set(result);
-    });
+    afterRenderEffect(() => this.draw(this.visiblePoints()));
+  }
 
-    afterRenderEffect(() => this.draw(this.points()));
+  protected load(name: string, tag: string, count: number) {
+    this.loading.set(true);
+
+    this.eventsService.getPoints(name, tag, count).subscribe({
+      next: result => {
+        this.points.set(result);
+        this.loading.set(false);
+      },
+      error: err => {
+        console.error(err);
+        this.points.set([]);
+        this.loading.set(false);
+      },
+    });
+  }
+
+  protected toggle(type: EventType) {
+    this.visibleTypes.update(v => ({ ...v, [type]: !v[type] }));
   }
 
   private draw(points: HeatmapPoint[]) {

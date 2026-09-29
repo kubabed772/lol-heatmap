@@ -1,4 +1,29 @@
-<p>Punkty: {{ points().length }}</p>
+<div class="d-flex gap-2 mb-3" style="max-width: 600px">
+  <input #nameInput class="form-control" placeholder="Nick" value="Słodki Femboy">
+  <input #tagInput class="form-control" placeholder="Tag" value="2137" style="max-width: 100px">
+  <input #countInput class="form-control" type="number" value="10" min="1" max="20" style="max-width: 80px">
+  <button class="btn btn-primary"
+          [disabled]="loading()"
+          (click)="load(nameInput.value, tagInput.value, +countInput.value)">
+    Pokaż
+  </button>
+</div>
+
+@if (loading()) {
+  <p>Ładowanie...</p>
+}
+
+<div class="d-flex gap-3 mb-2">
+  @for (type of types; track type) {
+    <label class="d-flex align-items-center gap-1">
+      <input type="checkbox" class="form-check-input mt-0"
+             [checked]="visibleTypes()[type]"
+             (change)="toggle(type)">
+      <span class="dot" [style.background]="colors[type]"></span>
+      {{ type }} ({{ counts()[type] }})
+    </label>
+  }
+</div>
 
 <div class="map">
   <img src="map11.png" alt="Summoner's Rift">
