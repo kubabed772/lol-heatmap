@@ -1,0 +1,14 @@
+.map {
+  position: relative;
+  width: 512px;
+  height: 512px;
+}
+
+.map img,
+.map canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 512px;
+  height: 512px;
+}
