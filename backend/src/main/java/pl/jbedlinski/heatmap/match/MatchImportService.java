@@ -1,11 +1,16 @@
 package pl.jbedlinski.heatmap.match;
 
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pl.jbedlinski.heatmap.riot.MatchDto;
 import pl.jbedlinski.heatmap.riot.RiotClient;
 import pl.jbedlinski.heatmap.riot.TimelineDto;
 
+import java.util.ArrayList;
+import java.util.List;
+
+@Slf4j
 @Service
 public class MatchImportService {
 
@@ -64,5 +69,24 @@ public class MatchImportService {
                 killEventRepository.save(k);
             }
         }
+    }
+
+
+    public List<String> fetchMatchIds(String puuid, int total) {
+        List<String> ids = new ArrayList<>();
+        int start = 0;
+
+        while (ids.size() < total) {
+            int pageSize = Math.min(100, total - ids.size());
+            List<String> page = riotClient.getMatchIds(puuid, start, pageSize);
+            log.info("Match ids: start={}, requested={}, got={}", start, pageSize, page.size());
+
+            ids.addAll(page);
+            if (page.size() < pageSize) break;
+
+            start += pageSize;
+        }
+
+        return ids;
     }
 }

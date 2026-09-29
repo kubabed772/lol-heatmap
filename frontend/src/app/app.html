@@ -3,26 +3,62 @@
   <input #tagInput class="form-control" placeholder="Tag" value="2137" style="max-width: 100px">
   <input #countInput class="form-control" type="number" value="10" min="1" max="20" style="max-width: 80px">
   <button class="btn btn-primary"
-          [disabled]="loading()"
+          [disabled]="loading() || importing()"
           (click)="load(nameInput.value, tagInput.value, +countInput.value)">
     Pokaż
   </button>
+  <button class="btn btn-outline-secondary"
+          [disabled]="importing()"
+          (click)="startImport(nameInput.value, tagInput.value, +countInput.value)">
+    Importuj
+  </button>
 </div>
+
+@if (importStatus(); as status) {
+  <p>
+    Import: {{ status.state }} ({{ status.done }} / {{ status.total }})
+    @if (status.state === 'WAITING') {
+      - limit Riota, wznowienie za {{ status.retryInSeconds }} s
+    }
+  </p>
+}
 
 @if (loading()) {
   <p>Ładowanie...</p>
 }
 
+<select class="form-select form-select-sm mb-2" style="max-width: 250px"
+        (change)="selectedChampion.set($any($event.target).value)">
+  <option value="">Wszystkie postacie</option>
+  @for (c of champions(); track c.name) {
+    <option [value]="c.name" [selected]="selectedChampion() === c.name">
+      {{ c.name }} ({{ c.games }})
+    </option>
+  }
+</select>
+
 <div class="d-flex gap-3 mb-2">
   @for (type of types; track type) {
     <label class="d-flex align-items-center gap-1">
-      <input type="checkbox" class="form-check-input mt-0"
-             [checked]="visibleTypes()[type]"
-             (change)="toggle(type)">
+      <input type="radio" class="form-check-input mt-0"
+             name="eventType"
+             [checked]="selectedType() === type"
+             (change)="selectedType.set(type)">
       <span class="dot" [style.background]="colors[type]"></span>
       {{ type }} ({{ counts()[type] }})
     </label>
   }
+</div>
+
+<div class="btn-group mb-2">
+  <button class="btn btn-sm"
+          [class.btn-dark]="mode() === 'heat'"
+          [class.btn-outline-dark]="mode() !== 'heat'"
+          (click)="mode.set('heat')">Heatmapa</button>
+  <button class="btn btn-sm"
+          [class.btn-dark]="mode() === 'dots'"
+          [class.btn-outline-dark]="mode() !== 'dots'"
+          (click)="mode.set('dots')">Kropki</button>
 </div>
 
 <div class="map">

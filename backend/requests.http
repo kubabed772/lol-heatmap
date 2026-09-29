@@ -17,4 +17,10 @@ GET http://localhost:6767/api/riot/matches/EUN1_4009128240/timeline
 GET http://localhost:6767/api/events?name=DobraDobra&tag=12345&count=1
 
 ### duzo meczow - test limitu
-GET http://localhost:6767/api/events?name=Słodki Femboy&tag=2137&count=70
+GET http://localhost:6767/api/events?name=Słodki Femboy&tag=2137&count=150
+
+### start importu
+POST http://localhost:6767/api/import?name=Słodki Femboy&tag=2137&count=300
+
+### status (wklej puuid z odpowiedzi wyżej)
+GET http://localhost:6767/api/import/CHA2Xl8_lMpv5T1H3aHG7UADYWgWX2yenl71Zz-2JSqSKOlCdZVVm0ajj_zDYrKzFG4KcsKB-j3_bg

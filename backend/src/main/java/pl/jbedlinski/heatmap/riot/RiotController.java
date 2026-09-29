@@ -23,7 +23,7 @@ public class RiotController {
     @GetMapping("/matches")
     public List<String> getMatchIds(@RequestParam String puuid,
                                     @RequestParam(defaultValue = "5") int count) {
-        return riotClient.getMatchIds(puuid, count);
+        return riotClient.getMatchIds(puuid, 0, count);
     }
 
     @GetMapping("/matches/{matchId}")

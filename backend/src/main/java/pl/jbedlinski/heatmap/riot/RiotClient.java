@@ -33,9 +33,10 @@ public class RiotClient {
                 .body(AccountDto.class);
     }
 
-    public List<String> getMatchIds(String puuid, int count) {
+    public List<String> getMatchIds(String puuid, int start, int count) {
         return rest.get()
-                .uri("/lol/match/v5/matches/by-puuid/{puuid}/ids?count={count}", puuid, count)
+                .uri("/lol/match/v5/matches/by-puuid/{puuid}/ids?start={start}&count={count}",
+                        puuid, start, count)
                 .retrieve()
                 .body(new ParameterizedTypeReference<List<String>>() {});
     }
